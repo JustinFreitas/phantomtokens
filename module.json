@@ -7,7 +7,7 @@
     "name": "saibot"
     }
   ],
-  "version": "4.0.1",
+  "version": "4.0.0-gygax75.1",
   "compatibility": {
     "minimum": "10",
     "verified": "14"
@@ -31,7 +31,7 @@
 	"scripts/PhantomRealm.js"
   ],
   "url": "https://github.com/JustinFreitas/phantomtokens",
-  "download": "https://github.com/JustinFreitas/phantomtokens/releases/download/v4.0.1/phantomtokens.zip",
+  "download": "https://github.com/JustinFreitas/phantomtokens/releases/download/v4.0.0-gygax75.1/phantomtokens.zip",
   "manifest": "https://github.com/JustinFreitas/phantomtokens/releases/latest/download/module.json",
   "readme": "https://github.com/JustinFreitas/phantomtokens/blob/main/README.md",
   "changelog": "https://github.com/JustinFreitas/phantomtokens/blob/main/CHANGELOG.md",
