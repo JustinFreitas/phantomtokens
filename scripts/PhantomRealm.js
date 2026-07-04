@@ -64,7 +64,7 @@ class SpookyFlags {
 class SpookyRealmManager {
 	static addSpookyRealmButton (pApp, pHTML, pInfos) {
 		if (game.user.isGM) {
-			if (game.release.generation <= 12 || pApp.activeControl == "tokens") {
+			if (game.release.generation <= 12 || (pApp.control?.name ?? pApp.activeControl) == "tokens") {
 				let vButton = document.createElement("li");
 				
 				let vtoAdd = vButton;
@@ -219,18 +219,23 @@ class SpookyRealmManager {
 		
 		if (game.modules.get(cLibWrapper)?.active) {
 			//use lib wrapper to monkey patch
-			libWrapper.register(cModuleName, "Token.prototype._canDrag", function(vWrapped, ...args) {if (canDrag(this.document)) {return vWrapped(...args)} return false}, "MIXED");
+			const tokenTarget = (vMethod) => typeof foundry !== "undefined" && foundry.canvas?.placeables?.Token
+				? `foundry.canvas.placeables.Token.prototype.${vMethod}`
+				: `Token.prototype.${vMethod}`;
+
+			libWrapper.register(cModuleName, tokenTarget("_canDrag"), function(vWrapped, ...args) {if (canDrag(this.document)) {return vWrapped(...args)} return false}, "MIXED");
 			
-			libWrapper.register(cModuleName, "Token.prototype._canControl", function(vWrapped, ...args) {if (canControl(this.document)) {return vWrapped(...args)} return false}, "MIXED");
+			libWrapper.register(cModuleName, tokenTarget("_canControl"), function(vWrapped, ...args) {if (canControl(this.document)) {return vWrapped(...args)} return false}, "MIXED");
 			
-			libWrapper.register(cModuleName, "Token.prototype._canHover", function(vWrapped, ...args) {if (canHover(this.document)) {return vWrapped(...args)} return false}, "MIXED");
+			libWrapper.register(cModuleName, tokenTarget("_canHover"), function(vWrapped, ...args) {if (canHover(this.document)) {return vWrapped(...args)} return false}, "MIXED");
 			
 			libWrapper.register(cModuleName, "CONFIG.Token.objectClass.prototype.isVisible", function(vWrapped, ...args) {if (isVisible(this.document)) {return vWrapped(...args)} return false}, "MIXED");
 		}
 		else {
 			//release the (spooky) monkeys
-			const vOldDragCall = Token.prototype._canDrag;
-			Token.prototype._canDrag = function (...args) {
+			const TokenClass = typeof foundry !== "undefined" && foundry.canvas?.placeables?.Token ? foundry.canvas.placeables.Token : globalThis.Token;
+			const vOldDragCall = TokenClass.prototype._canDrag;
+			TokenClass.prototype._canDrag = function (...args) {
 				let vCallOld = canDrag(this.document);
 				
 				if (vCallOld) {
@@ -239,8 +244,8 @@ class SpookyRealmManager {
 				}
 			}
 			
-			const vOldControlCall = Token.prototype._canControl;
-			Token.prototype._canControl = function (...args) {
+			const vOldControlCall = TokenClass.prototype._canControl;
+			TokenClass.prototype._canControl = function (...args) {
 				let vCallOld = canControl(this.document);
 				
 				if (vCallOld) {
@@ -249,8 +254,8 @@ class SpookyRealmManager {
 				}
 			}
 			
-			const vOldHoverCall = Token.prototype._canHover;
-			Token.prototype._canHover = function (...args) {
+			const vOldHoverCall = TokenClass.prototype._canHover;
+			TokenClass.prototype._canHover = function (...args) {
 				let vCallOld = canHover(this.document);
 				
 				if (vCallOld) {
